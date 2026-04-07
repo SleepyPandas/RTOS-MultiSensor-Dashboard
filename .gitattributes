@@ -1,2 +1,5 @@
 # STM32 vendor components should be hidden from exports and linguist stats
 Drivers/** linguist-vendored
+
+# Font tables are static assets; hide them from linguist stats and git diffs.
+Custom_Drivers/ST7789V3_Driver/fonts/** linguist-generated -diff
