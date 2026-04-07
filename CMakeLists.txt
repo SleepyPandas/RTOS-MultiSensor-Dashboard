@@ -45,12 +45,26 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/MPU6500_Driver/mpu6500.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/ST7789V3.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_8x8.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_8x16.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_16x16.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_16x24.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_16x32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_24x24.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_24x32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_32x32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_48x48.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver/fonts/font_64x64.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/MPU6500_Driver
+    ${CMAKE_CURRENT_SOURCE_DIR}/Custom_Drivers/ST7789V3_Driver
 )
 
 # Add project symbols (macros)
