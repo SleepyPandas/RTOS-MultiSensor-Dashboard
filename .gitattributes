@@ -3,3 +3,7 @@ Drivers/** linguist-vendored
 
 # Font tables are static assets; hide them from linguist stats and git diffs.
 Custom_Drivers/ST7789V3_Driver/fonts/** linguist-generated -diff
+
+# Custom drivers
+Custom_Drivers/** linguist-vendored
+Custom_Drivers/** -diff
