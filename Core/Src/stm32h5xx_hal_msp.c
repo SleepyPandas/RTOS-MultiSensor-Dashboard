@@ -69,10 +69,12 @@ void HAL_MspInit(void)
   /* USER CODE END MspInit 0 */
 
   /* System interrupt init*/
+  /* PendSV_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(PendSV_IRQn, 15, 0);
 
   /* Peripheral interrupt init */
   /* ICACHE_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(ICACHE_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(ICACHE_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(ICACHE_IRQn);
 
   /* USER CODE BEGIN MspInit 1 */
@@ -235,7 +237,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     }
 
     /* SPI1 interrupt Init */
-    HAL_NVIC_SetPriority(SPI1_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(SPI1_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(SPI1_IRQn);
     /* USER CODE BEGIN SPI1_MspInit 1 */
 
