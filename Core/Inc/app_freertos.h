@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name          : app_freertos.h
-  * Description        : FreeRTOS applicative header file
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name          : app_freertos.h
+ * Description        : FreeRTOS applicative header file
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -26,9 +26,10 @@ extern "C" {
 #endif
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
-#include "task.h"
-#include "main.h"
 #include "cmsis_os2.h"
+#include "main.h"
+#include "task.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -47,10 +48,24 @@ extern "C" {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+typedef struct {
+  int16_t Gyro_X;
+  int16_t Gyro_Y;
+  int16_t Gyro_Z;
 
+  float Accel_X;
+  float Accel_Y;
+  float Accel_Z;
+  
+} IMUSample_t;
+
+typedef struct {
+
+} UIState_t;
 /* USER CODE END PD */
 
-/* Exported macro -------------------------------------------------------------*/
+/* Exported macro
+ * -------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
@@ -60,7 +75,8 @@ extern osThreadId_t Update_DisplayHandle;
 extern osMessageQueueId_t ImuSampleQHandle;
 extern osMessageQueueId_t UiStateQHandle;
 
-/* Exported function prototypes -----------------------------------------------*/
+/* Exported function prototypes
+ * -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
