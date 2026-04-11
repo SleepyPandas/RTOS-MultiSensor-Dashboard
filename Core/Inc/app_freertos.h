@@ -54,14 +54,20 @@ extern "C" {
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
-extern osThreadId_t defaultTaskHandle;
+extern osThreadId_t Read_IMU_TaskHandle;
+extern osThreadId_t Update_Dashboard_TaskHandle;
+extern osThreadId_t Update_DisplayHandle;
+extern osMessageQueueId_t ImuSampleQHandle;
+extern osMessageQueueId_t UiStateQHandle;
 
 /* Exported function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void StartImuTask(void *argument);
+void StartDashboardTask(void *argument);
+void StartDisplayTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
