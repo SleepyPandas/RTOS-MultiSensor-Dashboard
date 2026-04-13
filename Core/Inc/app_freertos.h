@@ -53,9 +53,9 @@ typedef struct {
   int16_t Gyro_Y;
   int16_t Gyro_Z;
 
-  float Accel_X;
-  float Accel_Y;
-  float Accel_Z;
+  int16_t Accel_X;
+  int16_t Accel_Y;
+  int16_t Accel_Z;
   
 } IMUSample_t;
 
