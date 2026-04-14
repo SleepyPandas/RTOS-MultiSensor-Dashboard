@@ -38,16 +38,6 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
-/* USER CODE END ET */
-
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
-
-/* USER CODE END EC */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
 typedef struct {
   int16_t Gyro_X;
   int16_t Gyro_Y;
@@ -68,6 +58,17 @@ typedef struct {
   int16_t Accel_Y;
   int16_t Accel_Z;
 } UIState_t;
+
+/* USER CODE END ET */
+
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
+
+/* USER CODE END EC */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Exported macro
