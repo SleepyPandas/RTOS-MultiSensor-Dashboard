@@ -60,7 +60,13 @@ typedef struct {
 } IMUSample_t;
 
 typedef struct {
+  int16_t Gyro_X;
+  int16_t Gyro_Y;
+  int16_t Gyro_Z;
 
+  int16_t Accel_X;
+  int16_t Accel_Y;
+  int16_t Accel_Z;
 } UIState_t;
 /* USER CODE END PD */
 
