@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -53,6 +53,25 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+
+/*=============== ST7789V3 CONFIG ====================*/
+
+int8_t spi_write(uint16_t len, const uint8_t *pData);
+
+int8_t spi_write_dma(uint16_t len, const uint8_t *pdata);
+
+int8_t set_cs(GPIO_Pinstate state);
+
+int8_t set_dc(Trans_State state);
+
+int8_t set_rst(GPIO_Pinstate state);
+
+/*=============== MPU6500 CONFIG ====================*/
+
+int8_t I2C_Write(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
+                 uint16_t len);
+int8_t I2C_Read(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
+                uint16_t len);
 
 /* USER CODE END EFP */
 
