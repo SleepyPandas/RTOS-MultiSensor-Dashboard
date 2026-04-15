@@ -78,8 +78,6 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-ST7789V3_Config config;
-MPU6500_Config mpu_config;
 
 int8_t spi_write(uint16_t len, const uint8_t *pData) {
   uint8_t status = HAL_SPI_Transmit(&hspi1, pData, len, HAL_MAX_DELAY);
@@ -162,24 +160,6 @@ int main(void)
   MX_I2C2_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  ST7789V3_Config config = {
-      .spi_write = spi_write,
-      .spi_write_dma = spi_write_dma, // Set to NULL to disable DMA
-      .delay_ms = HAL_Delay,
-      .set_cs = set_cs,
-      .set_dc = set_dc,
-      .set_rst = set_rst,
-      .LCD_Width = 172,
-      .LCD_Height = 320,
-      .State = ST7789_STATE_READY,
-  };
-
-  MPU6500_Config mpu_config =
-  {
-    .write = I2C_Write,
-    .read = I2C_Read,
-    .delay_ms = HAL_Delay,
-  };
 
   /* USER CODE END 2 */
 

@@ -22,7 +22,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "ST7789V3.h"
+#include "fonts/fonts.h"
+#include "mpu6500.h"
+#include "main.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,6 +45,27 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+
+  
+
+  ST7789V3_Config config = {
+      .spi_write = spi_write,
+      .spi_write_dma = spi_write_dma, // Set to NULL to disable DMA
+      .delay_ms = HAL_Delay,
+      .set_cs = set_cs,
+      .set_dc = set_dc,
+      .set_rst = set_rst,
+      .LCD_Width = 172,
+      .LCD_Height = 320,
+      .State = ST7789_STATE_READY,
+  };
+
+  MPU6500_Config mpu_config =
+  {
+    .write = I2C_Write,
+    .read = I2C_Read,
+    .delay_ms = HAL_Delay,
+  };
 
 /* USER CODE END Variables */
 /* Definitions for Read_IMU_Task */
@@ -138,10 +162,30 @@ void MX_FREERTOS_Init(void) {
 void StartImuTask(void *argument)
 {
   /* USER CODE BEGIN Read_IMU_Task */
+  IMUSample_t sample;
+  MPU6500_Gyro_Data gyro;
+  MPU6500_Accel_Data accel;
+  MPU6500_Init(&mpu_config);
+  uint32_t next;
+
   /* Infinite loop */
-  for(;;)
+   for (;;)
   {
-    osDelay(1);
+    if (MPU6500_Read_Gyro_Data(&mpu_config, &gyro) == 0 &&
+        MPU6500_Read_Accel_Data(&mpu_config, &accel) == 0)
+    {
+      sample.Gyro_X = gyro.Gyro_X;
+      sample.Gyro_Y = gyro.Gyro_Y;
+      sample.Gyro_Z = gyro.Gyro_Z;
+      sample.Accel_X = accel.Accel_X;
+      sample.Accel_Y = accel.Accel_Y;
+      sample.Accel_Z = accel.Accel_Z;
+
+      osMessageQueuePut(ImuSampleQHandle, &sample, 0U, 0U);
+    }
+
+    next += 10;           // 10 ms = 100 Hz
+    osDelayUntil(next);   // fixed period
   }
   /* USER CODE END Read_IMU_Task */
 }
