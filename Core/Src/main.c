@@ -97,8 +97,6 @@ int8_t spi_write_dma(uint16_t len, const uint8_t *pdata) {
   return 0;
 }
 
-void HAL_Delay(uint32_t delay) { HAL_Delay(delay); }
-
 int8_t set_cs(GPIO_Pinstate state) {
   HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, state);
   return 0;
