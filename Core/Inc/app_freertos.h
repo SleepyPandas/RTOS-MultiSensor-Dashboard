@@ -26,10 +26,9 @@ extern "C" {
 #endif
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
-#include "cmsis_os2.h"
-#include "main.h"
 #include "task.h"
-
+#include "main.h"
+#include "cmsis_os2.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -71,8 +70,7 @@ typedef struct {
 
 /* USER CODE END PD */
 
-/* Exported macro
- * -------------------------------------------------------------*/
+/* Exported macro -------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
@@ -82,8 +80,7 @@ extern osThreadId_t Update_DisplayHandle;
 extern osMessageQueueId_t ImuSampleQHandle;
 extern osMessageQueueId_t UiStateQHandle;
 
-/* Exported function prototypes
- * -----------------------------------------------*/
+/* Exported function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
