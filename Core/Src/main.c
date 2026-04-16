@@ -96,17 +96,17 @@ int8_t spi_write_dma(uint16_t len, const uint8_t *pdata) {
   return 0;
 }
 
-int8_t set_cs(GPIO_Pinstate state) {
+int8_t set_cs(ST7789V3_PinState state) {
   HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, state);
   return 0;
 }
 
-int8_t set_dc(Trans_State state) {
+int8_t set_dc(ST7789V3_Trans_State state) {
   HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, state);
   return 0;
 }
 
-int8_t set_rst(GPIO_Pinstate state) {
+int8_t set_rst(ST7789V3_PinState state) {
   HAL_GPIO_WritePin(LCD_RES_GPIO_Port, LCD_RES_Pin, state);
   return 0;
 }
@@ -115,14 +115,14 @@ int8_t set_rst(GPIO_Pinstate state) {
 
 int8_t I2C_Write(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
                  uint16_t len) {
-  HAL_I2C_Mem_Write(&hi2c2, dev_addr, reg_addr, I2C_MEMADD_SIZE_8BIT, p_data,
+  HAL_I2C_Mem_Write(&hi2c1, dev_addr, reg_addr, I2C_MEMADD_SIZE_8BIT, p_data,
                     len, HAL_MAX_DELAY);
 
   return 0;
 }
 int8_t I2C_Read(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
                 uint16_t len) {
-  HAL_I2C_Mem_Read(&hi2c2, dev_addr, reg_addr, I2C_MEMADD_SIZE_8BIT, p_data,
+  HAL_I2C_Mem_Read(&hi2c1, dev_addr, reg_addr, I2C_MEMADD_SIZE_8BIT, p_data,
                    len, HAL_MAX_DELAY);
   return 0;
 }

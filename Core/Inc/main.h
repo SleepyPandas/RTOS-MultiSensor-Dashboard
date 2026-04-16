@@ -28,6 +28,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h5xx_hal.h"
+#include "ST7789V3.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -60,11 +61,11 @@ int8_t spi_write(uint16_t len, const uint8_t *pData);
 
 int8_t spi_write_dma(uint16_t len, const uint8_t *pdata);
 
-int8_t set_cs(GPIO_Pinstate state);
+int8_t set_cs(ST7789V3_PinState state);
 
-int8_t set_dc(Trans_State state);
+int8_t set_dc(ST7789V3_Trans_State state);
 
-int8_t set_rst(GPIO_Pinstate state);
+int8_t set_rst(ST7789V3_PinState state);
 
 /*=============== MPU6500 CONFIG ====================*/
 
