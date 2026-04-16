@@ -183,8 +183,9 @@ void StartImuTask(void *argument)
 
       osMessageQueuePut(ImuSampleQHandle, &sample, 0U, 0U);
     }
-
-    next += 10;           // 10 ms = 100 Hz
+    // On overflow RTOS tick counter has an expected warp behavior 
+    
+    next += 10;           // 10 ms = 100 Hz (we are using I2C limited at 100Hz so)
     osDelayUntil(next);   // fixed period
   }
   /* USER CODE END Read_IMU_Task */
