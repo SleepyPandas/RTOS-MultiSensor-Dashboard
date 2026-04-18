@@ -22,6 +22,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include "ST7789V3.h"
 #include "fonts/fonts.h"
 #include "mpu6500.h"
@@ -83,6 +86,10 @@ const osMessageQueueAttr_t UiStateQ_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+static void FormatFloat2(char *buffer, size_t buffer_size, float value);
+static void DrawValueIfChanged(uint16_t x, uint16_t y, uint16_t width,
+                               const char *value_text, char *last_text,
+                               size_t last_text_size);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -150,10 +157,13 @@ void StartImuTask(void *argument)
   IMUSample_t sample;
   MPU6500_Gyro_Data gyro;
   MPU6500_Accel_Data accel;
+  uint8_t gyro_offset[3] = {0};
 
   while (MPU6500_Init(&mpu_config) != 0) {
     osDelay(250);
   }
+
+  MPU6500_Gyro_Calibration(&mpu_config, gyro_offset);
 
   uint32_t next = osKernelGetTickCount();
 
@@ -226,6 +236,13 @@ void StartDisplayTask(void *argument)
   /* USER CODE BEGIN Update_Display */
 
   UIState_t ui;
+  char value_text[12];
+  char last_accel_x[12] = "";
+  char last_accel_y[12] = "";
+  char last_accel_z[12] = "";
+  char last_gyro_x[12] = "";
+  char last_gyro_y[12] = "";
+  char last_gyro_z[12] = "";
   
   ST7789V3_init(&st7789_config);
 
@@ -234,21 +251,75 @@ void StartDisplayTask(void *argument)
 
   FillScreen(&st7789_config, ORANGE);
 
-  DrawString(&st7789_config, 1, 1, "\n AX:0 \n AY:0 \n AZ:0",  WHITE, &Font_24x24);
-  
-  DrawString(&st7789_config, 130, 1, "\n GX:0 \n GY:0 \n GZ:0",  WHITE, &Font_24x24);
+  DrawString(&st7789_config, 0, 0, "AX:", WHITE, &Font_24x24);
+  DrawString(&st7789_config, 0, 56, "AY:", WHITE, &Font_24x24);
+  DrawString(&st7789_config, 0, 112, "AZ:", WHITE, &Font_24x24);
 
+  DrawString(&st7789_config, 160, 0, "GX:", WHITE, &Font_24x24);
+  DrawString(&st7789_config, 160, 56, "GY:", WHITE, &Font_24x24);
+  DrawString(&st7789_config, 160, 112, "GZ:", WHITE, &Font_24x24);
 
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    if (osMessageQueueGet(UiStateQHandle, &ui, NULL, osWaitForever) == osOK)
+    {
+      while (osMessageQueueGet(UiStateQHandle, &ui, NULL, 0U) == osOK) {
+      }
+
+      FormatFloat2(value_text, sizeof(value_text), ui.Accel_X);
+      DrawValueIfChanged(0, 24, 150, value_text, last_accel_x,
+                         sizeof(last_accel_x));
+
+      FormatFloat2(value_text, sizeof(value_text), ui.Accel_Y);
+      DrawValueIfChanged(0, 80, 150, value_text, last_accel_y,
+                         sizeof(last_accel_y));
+
+      FormatFloat2(value_text, sizeof(value_text), ui.Accel_Z);
+      DrawValueIfChanged(0, 136, 150, value_text, last_accel_z,
+                         sizeof(last_accel_z));
+
+      snprintf(value_text, sizeof(value_text), "%d", ui.Gyro_X);
+      DrawValueIfChanged(160, 24, 150, value_text, last_gyro_x,
+                         sizeof(last_gyro_x));
+
+      snprintf(value_text, sizeof(value_text), "%d", ui.Gyro_Y);
+      DrawValueIfChanged(160, 80, 150, value_text, last_gyro_y,
+                         sizeof(last_gyro_y));
+
+      snprintf(value_text, sizeof(value_text), "%d", ui.Gyro_Z);
+      DrawValueIfChanged(160, 136, 150, value_text, last_gyro_z,
+                         sizeof(last_gyro_z));
+    }
   }
   /* USER CODE END Update_Display */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+static void FormatFloat2(char *buffer, size_t buffer_size, float value)
+{
+  const char *sign = (value < 0.0f) ? "-" : "";
+  float abs_value = (value < 0.0f) ? -value : value;
+  int32_t centi_value = (int32_t)((abs_value * 100.0f) + 0.5f);
+  int32_t whole = centi_value / 100;
+  int32_t decimal = centi_value % 100;
+
+  snprintf(buffer, buffer_size, "%s%ld.%02ld", sign, (long)whole, (long)decimal);
+}
+
+static void DrawValueIfChanged(uint16_t x, uint16_t y, uint16_t width,
+                               const char *value_text, char *last_text,
+                               size_t last_text_size)
+{
+  if (strcmp(value_text, last_text) == 0) {
+    return;
+  }
+
+  DrawFilledRectangle(&st7789_config, x, y, width, 24, ORANGE);
+  DrawString(&st7789_config, x, y, value_text, WHITE, &Font_24x24);
+  snprintf(last_text, last_text_size, "%s", value_text);
+}
 
 /* USER CODE END Application */
 
