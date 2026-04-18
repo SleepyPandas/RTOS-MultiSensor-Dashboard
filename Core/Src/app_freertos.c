@@ -297,6 +297,9 @@ void StartDisplayTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+// Draws Number with 2 decimals, right aligned, and handles negative values
+// This is so we dont rely on floating point support in printf which can be large and we only need 2 decimals for the accelerometer values and also we dont need linker support for stm32
 static void FormatFloat2(char *buffer, size_t buffer_size, float value)
 {
   const char *sign = (value < 0.0f) ? "-" : "";
