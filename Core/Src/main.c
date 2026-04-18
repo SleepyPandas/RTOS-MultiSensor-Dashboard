@@ -184,14 +184,6 @@ int main(void) {
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  ST7789V3_init(&st7789_config);
-
-  InvertDisplay(&st7789_config, INVON);
-  SetRotation(&st7789_config, Landscape);
-
-  FillScreen(&st7789_config, CYAN);
-
-  // DrawString(&st7789_config, 16, 32, "Hello", WHITE, &Font_16x16);
   /* USER CODE END 2 */
 
   /* Init scheduler */
