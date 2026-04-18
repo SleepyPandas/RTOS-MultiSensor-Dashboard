@@ -73,6 +73,13 @@ const osThreadAttr_t Update_Display_attributes = {
   .priority = (osPriority_t) osPriorityBelowNormal1,
   .stack_size = 1024 * 4
 };
+/* Definitions for Update_UART_Log */
+osThreadId_t Update_UART_LogHandle;
+const osThreadAttr_t Update_UART_Log_attributes = {
+  .name = "Update_UART_Log",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 /* Definitions for ImuSampleQ */
 osMessageQueueId_t ImuSampleQHandle;
 const osMessageQueueAttr_t ImuSampleQ_attributes = {
@@ -130,6 +137,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of Update_Display */
   Update_DisplayHandle = osThreadNew(StartDisplayTask, NULL, &Update_Display_attributes);
+
+  /* creation of Update_UART_Log */
+  Update_UART_LogHandle = osThreadNew(Update_UART_Log, NULL, &Update_UART_Log_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   configASSERT(ImuSampleQHandle != NULL);
@@ -219,16 +229,8 @@ void StartDashboardTask(void *argument)
       ui.Gyro_Z = sample.Gyro_Z;
 
       osMessageQueuePut(UiStateQHandle, &ui, 0U, 0U);
-
-      sprintf(buffer,
-              "Gyro: X |%-4i|, Y|%-4i|, Z|%-4i| --- |  Accel: X |%7.4f|, Y "
-              "|%7.4f|, Z |%7.4f| \r\n",
-              sample.Gyro_X, sample.Gyro_Y, sample.Gyro_Z,
-              sample.Accel_X, sample.Accel_Y, sample.Accel_Z);
-
-
-      HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 100);
     }
+    
     osDelay(1);
   }
   /* USER CODE END Update_Dashboard_Task */
@@ -303,6 +305,36 @@ void StartDisplayTask(void *argument)
     }
   }
   /* USER CODE END Update_Display */
+}
+
+/* USER CODE BEGIN Header_Update_UART_Log */
+/**
+* @brief Function implementing the Update_UART_Log thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Update_UART_Log */
+void Update_UART_Log(void *argument)
+{
+  /* USER CODE BEGIN Update_UART_Log */
+    IMUSample_t sample;
+    char buffer[128];
+  /* Infinite loop */
+  for(;;)
+  {
+    if (osMessageQueueGet(ImuSampleQHandle, &sample, NULL, osWaitForever) == osOK) {
+      // Process the sample and update UI state
+      sprintf(buffer,
+              "Gyro: X |%-4i|, Y|%-4i|, Z|%-4i| --- |  Accel: X |%7.4f|, Y "
+              "|%7.4f|, Z |%7.4f| \r\n",
+              sample.Gyro_X, sample.Gyro_Y, sample.Gyro_Z,
+              sample.Accel_X, sample.Accel_Y, sample.Accel_Z);
+
+      HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 100);
+    }
+    osDelay(100);
+  }
+  /* USER CODE END Update_UART_Log */
 }
 
 /* Private application code --------------------------------------------------*/

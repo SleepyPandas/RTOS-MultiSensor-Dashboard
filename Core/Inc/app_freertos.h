@@ -77,6 +77,7 @@ typedef struct {
 extern osThreadId_t Read_IMU_TaskHandle;
 extern osThreadId_t Update_Dashboard_TaskHandle;
 extern osThreadId_t Update_DisplayHandle;
+extern osThreadId_t Update_UART_LogHandle;
 extern osMessageQueueId_t ImuSampleQHandle;
 extern osMessageQueueId_t UiStateQHandle;
 
@@ -88,6 +89,7 @@ extern osMessageQueueId_t UiStateQHandle;
 void StartImuTask(void *argument);
 void StartDashboardTask(void *argument);
 void StartDisplayTask(void *argument);
+void Update_UART_Log(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
