@@ -100,8 +100,10 @@ void MX_FREERTOS_Init(void) {
 
   FillScreen(&st7789_config, BLACK);
 
-  DrawString(&st7789_config, 1, 1, "\n X:0 \n Y:0 \n Z:0",  WHITE, &Font_32x32);
-  DrawString(&st7789_config, 130, 1, "\n X:0 \n Y:0 \n Z:0",  WHITE, &Font_32x32);
+  DrawString(&st7789_config, 1, 1, "\n AX:0 \n AY:0 \n AZ:0",  WHITE, &Font_24x24);
+  
+  DrawString(&st7789_config, 130, 1, "\n GX:0 \n GY:0 \n GZ:0",  WHITE, &Font_24x24);
+
 
 
   /* USER CODE END Init */
@@ -157,7 +159,7 @@ void StartImuTask(void *argument)
   MPU6500_Gyro_Data gyro;
   MPU6500_Accel_Data accel;
   MPU6500_Init(&mpu_config);
-  uint32_t next;
+  uint32_t next = osKernelGetTickCount();
 
   /* Infinite loop */
    for (;;)
