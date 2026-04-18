@@ -190,9 +190,25 @@ void StartImuTask(void *argument)
 void StartDashboardTask(void *argument)
 {
   /* USER CODE BEGIN Update_Dashboard_Task */
+
+    IMUSample_t sample;
+    UIState_t ui;
+
+  
   /* Infinite loop */
   for(;;)
   {
+    if (osMessageQueueGet(ImuSampleQHandle, &sample, NULL, osWaitForever) == osOK) {
+      // Process the sample and update UI state
+      ui.Accel_X = sample.Accel_X;
+      ui.Accel_Y = sample.Accel_Y;
+      ui.Accel_Z = sample.Accel_Z;
+      ui.Gyro_X = sample.Gyro_X;
+      ui.Gyro_Y = sample.Gyro_Y;
+      ui.Gyro_Z = sample.Gyro_Z;
+
+      osMessageQueuePut(UiStateQHandle, &ui, 0U, 0U);
+    }
     osDelay(1);
   }
   /* USER CODE END Update_Dashboard_Task */
@@ -208,6 +224,9 @@ void StartDashboardTask(void *argument)
 void StartDisplayTask(void *argument)
 {
   /* USER CODE BEGIN Update_Display */
+
+  UIState_t ui;
+  
   ST7789V3_init(&st7789_config);
 
   InvertDisplay(&st7789_config, INVON);
@@ -217,13 +236,13 @@ void StartDisplayTask(void *argument)
 
   DrawString(&st7789_config, 1, 1, "\n AX:0 \n AY:0 \n AZ:0",  WHITE, &Font_24x24);
   
-  // DrawString(&st7789_config, 130, 1, "\n GX:0 \n GY:0 \n GZ:0",  WHITE, &Font_24x24);
+  DrawString(&st7789_config, 130, 1, "\n GX:0 \n GY:0 \n GZ:0",  WHITE, &Font_24x24);
 
 
   /* Infinite loop */
   for(;;)
   {
-    osDelay(120);
+    osDelay(1);
   }
   /* USER CODE END Update_Display */
 }
