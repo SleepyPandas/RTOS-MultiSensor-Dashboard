@@ -58,6 +58,16 @@ typedef struct {
   float Accel_Z;
 } UIState_t;
 
+typedef struct {
+  int16_t Gyro_X;
+  int16_t Gyro_Y;
+  int16_t Gyro_Z;
+
+  float Accel_X;
+  float Accel_Y;
+  float Accel_Z;
+} UARTSample_t;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
