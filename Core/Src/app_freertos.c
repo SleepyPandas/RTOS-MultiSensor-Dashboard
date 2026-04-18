@@ -61,14 +61,14 @@ osThreadId_t Update_Dashboard_TaskHandle;
 const osThreadAttr_t Update_Dashboard_Task_attributes = {
   .name = "Update_Dashboard_Task",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 384 * 4
+  .stack_size = 512 * 4
 };
 /* Definitions for Update_Display */
 osThreadId_t Update_DisplayHandle;
 const osThreadAttr_t Update_Display_attributes = {
   .name = "Update_Display",
-  .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 512 * 4
+  .priority = (osPriority_t) osPriorityBelowNormal1,
+  .stack_size = 1024 * 4
 };
 /* Definitions for ImuSampleQ */
 osMessageQueueId_t ImuSampleQHandle;
@@ -93,18 +93,6 @@ const osMessageQueueAttr_t UiStateQ_attributes = {
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-  ST7789V3_init(&st7789_config);
-
-  InvertDisplay(&st7789_config, INVON);
-  SetRotation(&st7789_config, Landscape);
-
-  FillScreen(&st7789_config, BLACK);
-
-  DrawString(&st7789_config, 1, 1, "\n AX:0 \n AY:0 \n AZ:0",  WHITE, &Font_24x24);
-  
-  DrawString(&st7789_config, 130, 1, "\n GX:0 \n GY:0 \n GZ:0",  WHITE, &Font_24x24);
-
-
 
   /* USER CODE END Init */
 
@@ -137,7 +125,11 @@ void MX_FREERTOS_Init(void) {
   Update_DisplayHandle = osThreadNew(StartDisplayTask, NULL, &Update_Display_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+  configASSERT(ImuSampleQHandle != NULL);
+  configASSERT(UiStateQHandle != NULL);
+  configASSERT(Read_IMU_TaskHandle != NULL);
+  configASSERT(Update_Dashboard_TaskHandle != NULL);
+  configASSERT(Update_DisplayHandle != NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -158,7 +150,11 @@ void StartImuTask(void *argument)
   IMUSample_t sample;
   MPU6500_Gyro_Data gyro;
   MPU6500_Accel_Data accel;
-  MPU6500_Init(&mpu_config);
+
+  while (MPU6500_Init(&mpu_config) != 0) {
+    osDelay(250);
+  }
+
   uint32_t next = osKernelGetTickCount();
 
   /* Infinite loop */
@@ -212,10 +208,22 @@ void StartDashboardTask(void *argument)
 void StartDisplayTask(void *argument)
 {
   /* USER CODE BEGIN Update_Display */
+  ST7789V3_init(&st7789_config);
+
+  InvertDisplay(&st7789_config, INVON);
+  SetRotation(&st7789_config, Landscape);
+
+  FillScreen(&st7789_config, ORANGE);
+
+  DrawString(&st7789_config, 1, 1, "\n AX:0 \n AY:0 \n AZ:0",  WHITE, &Font_24x24);
+  
+  // DrawString(&st7789_config, 130, 1, "\n GX:0 \n GY:0 \n GZ:0",  WHITE, &Font_24x24);
+
+
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(120);
   }
   /* USER CODE END Update_Display */
 }
