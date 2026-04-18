@@ -78,7 +78,7 @@ osThreadId_t Update_UART_LogHandle;
 const osThreadAttr_t Update_UART_Log_attributes = {
   .name = "Update_UART_Log",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
+  .stack_size = 256 * 4
 };
 /* Definitions for ImuSampleQ */
 osMessageQueueId_t ImuSampleQHandle;
@@ -89,6 +89,11 @@ const osMessageQueueAttr_t ImuSampleQ_attributes = {
 osMessageQueueId_t UiStateQHandle;
 const osMessageQueueAttr_t UiStateQ_attributes = {
   .name = "UiStateQ"
+};
+/* Definitions for UartLogQ */
+osMessageQueueId_t UartLogQHandle;
+const osMessageQueueAttr_t UartLogQ_attributes = {
+  .name = "UartLogQ"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -125,6 +130,8 @@ void MX_FREERTOS_Init(void) {
   ImuSampleQHandle = osMessageQueueNew (8, sizeof(IMUSample_t), &ImuSampleQ_attributes);
   /* creation of UiStateQ */
   UiStateQHandle = osMessageQueueNew (2, sizeof(UIState_t), &UiStateQ_attributes);
+  /* creation of UartLogQ */
+  UartLogQHandle = osMessageQueueNew (8, sizeof(UARTSample_t), &UartLogQ_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */

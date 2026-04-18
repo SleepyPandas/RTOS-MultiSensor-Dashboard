@@ -80,6 +80,7 @@ extern osThreadId_t Update_DisplayHandle;
 extern osThreadId_t Update_UART_LogHandle;
 extern osMessageQueueId_t ImuSampleQHandle;
 extern osMessageQueueId_t UiStateQHandle;
+extern osMessageQueueId_t UartLogQHandle;
 
 /* Exported function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
