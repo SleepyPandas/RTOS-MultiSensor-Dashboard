@@ -55,7 +55,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
-
+extern UART_HandleTypeDef huart3;
 
 /*=============== ST7789V3 CONFIG ====================*/
 
