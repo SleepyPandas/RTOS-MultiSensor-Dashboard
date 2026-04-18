@@ -203,6 +203,7 @@ void StartDashboardTask(void *argument)
 
     IMUSample_t sample;
     UIState_t ui;
+    char buffer[128];
 
   
   /* Infinite loop */
@@ -218,6 +219,15 @@ void StartDashboardTask(void *argument)
       ui.Gyro_Z = sample.Gyro_Z;
 
       osMessageQueuePut(UiStateQHandle, &ui, 0U, 0U);
+
+      sprintf(buffer,
+              "Gyro: X |%-4i|, Y|%-4i|, Z|%-4i| --- |  Accel: X |%7.4f|, Y "
+              "|%7.4f|, Z |%7.4f| \r\n",
+              sample.Gyro_X, sample.Gyro_Y, sample.Gyro_Z,
+              sample.Accel_X, sample.Accel_Y, sample.Accel_Z);
+
+
+      HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 100);
     }
     osDelay(1);
   }
