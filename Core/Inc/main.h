@@ -28,11 +28,11 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h5xx_hal.h"
-#include "ST7789V3.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "ST7789V3.h"
+#include "mpu6500.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -55,6 +55,8 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+
+
 /*=============== ST7789V3 CONFIG ====================*/
 
 int8_t spi_write(uint16_t len, const uint8_t *pData);
@@ -67,12 +69,16 @@ int8_t set_dc(ST7789V3_Trans_State state);
 
 int8_t set_rst(ST7789V3_PinState state);
 
+extern ST7789V3_Config st7789_config;
+
 /*=============== MPU6500 CONFIG ====================*/
 
 int8_t I2C_Write(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
                  uint16_t len);
 int8_t I2C_Read(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
                 uint16_t len);
+
+extern MPU6500_Config mpu_config;
 
 /* USER CODE END EFP */
 

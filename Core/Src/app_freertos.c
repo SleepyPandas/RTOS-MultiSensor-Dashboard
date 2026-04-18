@@ -46,26 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-  
 
-  ST7789V3_Config config = {
-      .spi_write = spi_write,
-      .spi_write_dma = spi_write_dma, // Set to NULL to disable DMA
-      .delay_ms = HAL_Delay,
-      .set_cs = set_cs,
-      .set_dc = set_dc,
-      .set_rst = set_rst,
-      .LCD_Width = 172,
-      .LCD_Height = 320,
-      .State = ST7789_STATE_READY,
-  };
-
-  MPU6500_Config mpu_config =
-  {
-    .write = I2C_Write,
-    .read = I2C_Read,
-    .delay_ms = HAL_Delay,
-  };
 
 /* USER CODE END Variables */
 /* Definitions for Read_IMU_Task */
@@ -112,6 +93,16 @@ const osMessageQueueAttr_t UiStateQ_attributes = {
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
+  ST7789V3_init(&st7789_config);
+
+  InvertDisplay(&st7789_config, INVON);
+  SetRotation(&st7789_config, Landscape);
+
+  FillScreen(&st7789_config, BLACK);
+
+  DrawString(&st7789_config, 1, 1, "\n X:0 \n Y:0 \n Z:0",  WHITE, &Font_32x32);
+  DrawString(&st7789_config, 130, 1, "\n X:0 \n Y:0 \n Z:0",  WHITE, &Font_32x32);
+
 
   /* USER CODE END Init */
 
