@@ -313,6 +313,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+AGENTS.md
 
 # Spyder project settings
 .spyderproject
@@ -372,3 +373,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 PersonalconfigNotes.md
+
