@@ -219,8 +219,9 @@ void StartDashboardTask(void *argument)
   /* USER CODE BEGIN Update_Dashboard_Task */
 
     IMUSample_t sample;
+    UARTSample_t uart_sample;
     UIState_t ui;
-    char buffer[128];
+
 
   
   /* Infinite loop */
@@ -235,9 +236,18 @@ void StartDashboardTask(void *argument)
       ui.Gyro_Y = sample.Gyro_Y;
       ui.Gyro_Z = sample.Gyro_Z;
 
+
+      uart_sample.Accel_X = sample.Accel_X;
+      uart_sample.Accel_Y = sample.Accel_Y;
+      uart_sample.Accel_Z = sample.Accel_Z;
+      uart_sample.Gyro_X = sample.Gyro_X;
+      uart_sample.Gyro_Y = sample.Gyro_Y;
+      uart_sample.Gyro_Z = sample.Gyro_Z;
+
       osMessageQueuePut(UiStateQHandle, &ui, 0U, 0U);
+      osMessageQueuePut(UartLogQHandle, &uart_sample, 0U, 0U);
     }
-    
+
     osDelay(1);
   }
   /* USER CODE END Update_Dashboard_Task */
@@ -324,18 +334,24 @@ void StartDisplayTask(void *argument)
 void Update_UART_Log(void *argument)
 {
   /* USER CODE BEGIN Update_UART_Log */
-    IMUSample_t sample;
+    UARTSample_t sample;
     char buffer[128];
+    char accel_x_text[12];
+    char accel_y_text[12];
+    char accel_z_text[12];
   /* Infinite loop */
   for(;;)
   {
-    if (osMessageQueueGet(ImuSampleQHandle, &sample, NULL, osWaitForever) == osOK) {
-      // Process the sample and update UI state
-      sprintf(buffer,
-              "Gyro: X |%-4i|, Y|%-4i|, Z|%-4i| --- |  Accel: X |%7.4f|, Y "
-              "|%7.4f|, Z |%7.4f| \r\n",
-              sample.Gyro_X, sample.Gyro_Y, sample.Gyro_Z,
-              sample.Accel_X, sample.Accel_Y, sample.Accel_Z);
+    if (osMessageQueueGet(UartLogQHandle, &sample, NULL, osWaitForever) == osOK) {
+      FormatFloat2(accel_x_text, sizeof(accel_x_text), sample.Accel_X);
+      FormatFloat2(accel_y_text, sizeof(accel_y_text), sample.Accel_Y);
+      FormatFloat2(accel_z_text, sizeof(accel_z_text), sample.Accel_Z);
+
+      snprintf(buffer, sizeof(buffer),
+               "Gyro: X |%-4i|, Y|%-4i|, Z|%-4i| --- |  Accel: X |%s|, Y "
+               "|%s|, Z |%s| \r\n",
+               sample.Gyro_X, sample.Gyro_Y, sample.Gyro_Z,
+               accel_x_text, accel_y_text, accel_z_text);
 
       HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 100);
     }
