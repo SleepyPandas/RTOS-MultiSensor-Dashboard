@@ -131,7 +131,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
     handle_GPDMA1_Channel6.Init.BlkHWRequest = DMA_BREQ_SINGLE_BURST;
     handle_GPDMA1_Channel6.Init.Direction = DMA_PERIPH_TO_MEMORY;
     handle_GPDMA1_Channel6.Init.SrcInc = DMA_SINC_FIXED;
-    handle_GPDMA1_Channel6.Init.DestInc = DMA_DINC_FIXED;
+    handle_GPDMA1_Channel6.Init.DestInc = DMA_DINC_INCREMENTED;
     handle_GPDMA1_Channel6.Init.SrcDataWidth = DMA_SRC_DATAWIDTH_BYTE;
     handle_GPDMA1_Channel6.Init.DestDataWidth = DMA_DEST_DATAWIDTH_BYTE;
     handle_GPDMA1_Channel6.Init.Priority = DMA_LOW_PRIORITY_LOW_WEIGHT;
