@@ -80,6 +80,11 @@ const osThreadAttr_t Update_UART_Log_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 256 * 4
 };
+/* Definitions for ScreenMutex */
+osMutexId_t ScreenMutexHandle;
+const osMutexAttr_t ScreenMutex_attributes = {
+  .name = "ScreenMutex"
+};
 /* Definitions for ImuSampleQ */
 osMessageQueueId_t ImuSampleQHandle;
 const osMessageQueueAttr_t ImuSampleQ_attributes = {
@@ -94,6 +99,11 @@ const osMessageQueueAttr_t UiStateQ_attributes = {
 osMessageQueueId_t UartLogQHandle;
 const osMessageQueueAttr_t UartLogQ_attributes = {
   .name = "UartLogQ"
+};
+/* Definitions for IMUDmaDoneSem */
+osSemaphoreId_t IMUDmaDoneSemHandle;
+const osSemaphoreAttr_t IMUDmaDoneSem_attributes = {
+  .name = "IMUDmaDoneSem"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -114,10 +124,14 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
+  /* creation of ScreenMutex */
+  ScreenMutexHandle = osMutexNew(&ScreenMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
+  /* creation of IMUDmaDoneSem */
+  IMUDmaDoneSemHandle = osSemaphoreNew(1, 1, &IMUDmaDoneSem_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
