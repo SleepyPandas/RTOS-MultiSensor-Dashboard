@@ -131,7 +131,7 @@ void MX_FREERTOS_Init(void) {
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
   /* creation of IMUDmaDoneSem */
-  IMUDmaDoneSemHandle = osSemaphoreNew(1, 1, &IMUDmaDoneSem_attributes);
+  IMUDmaDoneSemHandle = osSemaphoreNew(1, 0, &IMUDmaDoneSem_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
