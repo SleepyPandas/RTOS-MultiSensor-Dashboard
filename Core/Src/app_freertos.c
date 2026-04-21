@@ -278,6 +278,10 @@ void StartDisplayTask(void *argument)
 {
   /* USER CODE BEGIN Update_Display */
 
+  if (osMutexAcquire(ScreenMutexHandle, osWaitForever) != osOK) {
+    return;
+  }
+
   UIState_t ui;
   char value_text[12];
   char last_accel_x[12] = "";
@@ -334,6 +338,9 @@ void StartDisplayTask(void *argument)
       DrawValueIfChanged(160, 136, 150, value_text, last_gyro_z,
                          sizeof(last_gyro_z));
     }
+
+    osMutexRelease(ScreenMutexHandle);
+    osDelay(1);
   }
   /* USER CODE END Update_Display */
 }
