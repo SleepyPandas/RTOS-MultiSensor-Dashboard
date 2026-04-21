@@ -161,6 +161,17 @@ int8_t I2C_Write(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
 
   return (status == HAL_OK) ? 0 : -1;
 }
+
+int8_t I2C_Write_DMA(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
+                 uint16_t len) {
+  HAL_StatusTypeDef status =
+      HAL_I2C_Mem_Write_DMA(&hi2c1, dev_addr, reg_addr, I2C_MEMADD_SIZE_8BIT,
+                        p_data, len);
+
+  return (status == HAL_OK) ? 0 : -1;
+}
+
+
 int8_t I2C_Read(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
                 uint16_t len) {
   HAL_StatusTypeDef status =
@@ -169,6 +180,17 @@ int8_t I2C_Read(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
 
   return (status == HAL_OK) ? 0 : -1;
 }
+
+int8_t I2C_Read_DMA(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
+                uint16_t len) {
+  HAL_StatusTypeDef status =
+      HAL_I2C_Mem_Read_DMA(&hi2c1, dev_addr, reg_addr, I2C_MEMADD_SIZE_8BIT,
+                       p_data, len);
+
+  return (status == HAL_OK) ? 0 : -1;
+}
+
+
 /* USER CODE END 0 */
 
 /**
