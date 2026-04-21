@@ -191,9 +191,9 @@ void StartImuTask(void *argument)
   MPU6500_Accel_Data accel;
   uint8_t gyro_offset[3] = {0};
 
-  while (MPU6500_Init(&mpu_config) != 0) {
-    osDelay(100);
-  }
+  // while (MPU6500_Init(&mpu_config) != 0) {
+  //   osDelay(100);
+  // }
 
   MPU6500_Gyro_Calibration(&mpu_config, gyro_offset);
 
@@ -314,7 +314,7 @@ void StartDisplayTask(void *argument)
     if (osMessageQueueGet(UiStateQHandle, &ui, NULL, osWaitForever) == osOK)
     {
       // Clear any pending messages to avoid updating display with old values when we are too slow to consume all messages
-      
+
       while (osMessageQueueGet(UiStateQHandle, &ui, NULL, 0U) == osOK) {
       }
 
