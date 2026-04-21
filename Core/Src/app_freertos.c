@@ -177,7 +177,7 @@ void StartImuTask(void *argument)
   uint8_t gyro_offset[3] = {0};
 
   while (MPU6500_Init(&mpu_config) != 0) {
-    osDelay(250);
+    osDelay(100);
   }
 
   MPU6500_Gyro_Calibration(&mpu_config, gyro_offset);
@@ -355,7 +355,7 @@ void Update_UART_Log(void *argument)
 
       HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 100);
     }
-    osDelay(100);
+    osDelay(50);
   }
   /* USER CODE END Update_UART_Log */
 }
