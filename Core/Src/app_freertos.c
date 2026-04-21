@@ -163,6 +163,7 @@ void MX_FREERTOS_Init(void) {
   Update_UART_LogHandle = osThreadNew(Update_UART_Log, NULL, &Update_UART_Log_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
+  configASSERT(ScreenMutexHandle != NULL);
   configASSERT(ImuSampleQHandle != NULL);
   configASSERT(UiStateQHandle != NULL);
   configASSERT(Read_IMU_TaskHandle != NULL);
@@ -277,11 +278,6 @@ void StartDashboardTask(void *argument)
 void StartDisplayTask(void *argument)
 {
   /* USER CODE BEGIN Update_Display */
-
-  if (osMutexAcquire(ScreenMutexHandle, osWaitForever) != osOK) {
-    return;
-  }
-
   UIState_t ui;
   char value_text[12];
   char last_accel_x[12] = "";
@@ -290,7 +286,11 @@ void StartDisplayTask(void *argument)
   char last_gyro_x[12] = "";
   char last_gyro_y[12] = "";
   char last_gyro_z[12] = "";
-  
+
+  if (osMutexAcquire(ScreenMutexHandle, osWaitForever) != osOK) {
+    return;
+  }
+
   ST7789V3_init(&st7789_config);
 
   InvertDisplay(&st7789_config, INVON);
@@ -306,12 +306,18 @@ void StartDisplayTask(void *argument)
   DrawString(&st7789_config, 160, 56, "GY:", WHITE, &Font_24x24);
   DrawString(&st7789_config, 160, 112, "GZ:", WHITE, &Font_24x24);
 
+  osMutexRelease(ScreenMutexHandle);
+
   /* Infinite loop */
   for(;;)
   {
     if (osMessageQueueGet(UiStateQHandle, &ui, NULL, osWaitForever) == osOK)
     {
       while (osMessageQueueGet(UiStateQHandle, &ui, NULL, 0U) == osOK) {
+      }
+
+      if (osMutexAcquire(ScreenMutexHandle, osWaitForever) != osOK) {
+        continue;
       }
 
       FormatFloat2(value_text, sizeof(value_text), ui.Accel_X);
@@ -337,9 +343,9 @@ void StartDisplayTask(void *argument)
       snprintf(value_text, sizeof(value_text), "%d", ui.Gyro_Z);
       DrawValueIfChanged(160, 136, 150, value_text, last_gyro_z,
                          sizeof(last_gyro_z));
-    }
 
-    osMutexRelease(ScreenMutexHandle);
+      osMutexRelease(ScreenMutexHandle);
+    }
     osDelay(1);
   }
   /* USER CODE END Update_Display */
