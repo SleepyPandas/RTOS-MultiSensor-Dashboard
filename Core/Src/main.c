@@ -80,8 +80,8 @@ ST7789V3_Config st7789_config = {
 };
 
 MPU6500_Config mpu_config = {
-    .write = I2C_Write,
-    .read = I2C_Read,
+    .write = I2C_Write_DMA,
+    .read = I2C_Read_DMA,
     .delay_ms = app_delay_ms,
 };
 
@@ -189,6 +189,8 @@ int8_t I2C_Read_DMA(uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data,
 
   return (status == HAL_OK) ? 0 : -1;
 }
+
+
 
 
 /* USER CODE END 0 */
@@ -560,7 +562,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
+  if (hi2c->Instance == I2C1 && IMUDmaDoneSemHandle != NULL) {
+    osSemaphoreRelease(IMUDmaDoneSemHandle);
+  }
+}
 /* USER CODE END 4 */
 
 /**
