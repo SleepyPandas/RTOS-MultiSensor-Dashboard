@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name          : app_freertos.c
-  * Description        : FreeRTOS applicative file
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name          : app_freertos.c
+ * Description        : FreeRTOS applicative file
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -22,13 +22,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ST7789V3.h"
+#include "fonts/fonts.h"
+#include "main.h"
+#include "mpu6500.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "ST7789V3.h"
-#include "fonts/fonts.h"
-#include "mpu6500.h"
-#include "main.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,8 +49,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
-
 
 /* USER CODE END Variables */
 /* Definitions for Read_IMU_Task */
@@ -178,71 +177,102 @@ void MX_FREERTOS_Init(void) {
 }
 /* USER CODE BEGIN Header_StartImuTask */
 /**
-* @brief Function implementing the Read_IMU_Task thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the Read_IMU_Task thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartImuTask */
 void StartImuTask(void *argument)
 {
   /* USER CODE BEGIN Read_IMU_Task */
   IMUSample_t sample;
+  uint8_t gyro_raw[6] = {0};
+  uint8_t accel_raw[6] = {0};
+  int8_t gyro_offset[3] = {0};
+
   MPU6500_Gyro_Data gyro;
   MPU6500_Accel_Data accel;
-  uint8_t gyro_offset[3] = {0};
 
-  // while (MPU6500_Init(&mpu_config) != 0) {
-  //   osDelay(100);
-  // }
-
+  mpu_config.write = I2C_Write;
+  mpu_config.read = I2C_Read;
+  
+  MPU6500_Init(&mpu_config);
   MPU6500_Gyro_Calibration(&mpu_config, gyro_offset);
+
+  mpu_config.write = I2C_Write_DMA;
+  mpu_config.read = I2C_Read_DMA;
 
   uint32_t next = osKernelGetTickCount();
 
   /* Infinite loop */
-   for (;;)
-  {
-    if (MPU6500_Read_Gyro_Data(&mpu_config, &gyro) == 0 &&
-        MPU6500_Read_Accel_Data(&mpu_config, &accel) == 0)
-    {
-      sample.Gyro_X = gyro.Gyro_X;
-      sample.Gyro_Y = gyro.Gyro_Y;
-      sample.Gyro_Z = gyro.Gyro_Z;
-      sample.Accel_X = accel.Accel_X;
-      sample.Accel_Y = accel.Accel_Y;
-      sample.Accel_Z = accel.Accel_Z;
+  for (;;) {
+    // Start the Read one at a time they share the same DMA BUS
 
-      osMessageQueuePut(ImuSampleQHandle, &sample, 0U, 0U);
+    if (MPU6500_Read_Gyro_DMA(&mpu_config, gyro_raw) == 0) {
+      if (osSemaphoreAcquire(IMUDmaDoneSemHandle, 20) == osOK) {
+        MPU6500_Process_Gyro_DMA(&mpu_config, gyro_raw, &gyro);
+      } else {
+        // DMA did not finish in time, skip this loop
+        next += 10;
+        osDelayUntil(next);
+        continue;
+      }
+    } else {
+      next += 10;
+      osDelayUntil(next);
+      continue;
     }
-    // On overflow RTOS tick counter has an expected warp behavior 
-    
-    next += 10;           // 10 ms = 100 Hz (we are using I2C limited at 100Hz so)
-    osDelayUntil(next);   // fixed period
+
+    if (MPU6500_Read_Accel_DMA(&mpu_config, accel_raw) == 0) {
+      if (osSemaphoreAcquire(IMUDmaDoneSemHandle, 20) == osOK) {
+        MPU6500_Process_Accel_DMA(&mpu_config, accel_raw, &accel);
+      } else {
+        next += 10;
+        osDelayUntil(next);
+        continue;
+      }
+    } else {
+      next += 10;
+      osDelayUntil(next);
+      continue;
+    }
+
+    sample.Gyro_X = gyro.Gyro_X;
+    sample.Gyro_Y = gyro.Gyro_Y;
+    sample.Gyro_Z = gyro.Gyro_Z;
+    sample.Accel_X = accel.Accel_X;
+    sample.Accel_Y = accel.Accel_Y;
+    sample.Accel_Z = accel.Accel_Z;
+
+    osMessageQueuePut(ImuSampleQHandle, &sample, 0U, 0U);
+
+    // On overflow RTOS tick counter has an expected warp behavior
+
+    next += 10;         // 10 ms = 100 Hz (we are using I2C limited at 100Hz so)
+    osDelayUntil(next); // fixed period
   }
   /* USER CODE END Read_IMU_Task */
 }
 
 /* USER CODE BEGIN Header_StartDashboardTask */
 /**
-* @brief Function implementing the Update_Dashboard_Task thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the Update_Dashboard_Task thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartDashboardTask */
 void StartDashboardTask(void *argument)
 {
   /* USER CODE BEGIN Update_Dashboard_Task */
 
-    IMUSample_t sample;
-    UARTSample_t uart_sample;
-    UIState_t ui;
+  IMUSample_t sample;
+  UARTSample_t uart_sample;
+  UIState_t ui;
 
-
-  
   /* Infinite loop */
-  for(;;)
-  {
-    if (osMessageQueueGet(ImuSampleQHandle, &sample, NULL, osWaitForever) == osOK) {
+  for (;;) {
+    if (osMessageQueueGet(ImuSampleQHandle, &sample, NULL, osWaitForever) ==
+        osOK) {
       // Process the sample and update UI state
       ui.Accel_X = sample.Accel_X;
       ui.Accel_Y = sample.Accel_Y;
@@ -250,7 +280,6 @@ void StartDashboardTask(void *argument)
       ui.Gyro_X = sample.Gyro_X;
       ui.Gyro_Y = sample.Gyro_Y;
       ui.Gyro_Z = sample.Gyro_Z;
-
 
       uart_sample.Accel_X = sample.Accel_X;
       uart_sample.Accel_Y = sample.Accel_Y;
@@ -270,10 +299,10 @@ void StartDashboardTask(void *argument)
 
 /* USER CODE BEGIN Header_StartDisplayTask */
 /**
-* @brief Function implementing the Update_Display thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the Update_Display thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartDisplayTask */
 void StartDisplayTask(void *argument)
 {
@@ -309,11 +338,10 @@ void StartDisplayTask(void *argument)
   osMutexRelease(ScreenMutexHandle);
 
   /* Infinite loop */
-  for(;;)
-  {
-    if (osMessageQueueGet(UiStateQHandle, &ui, NULL, osWaitForever) == osOK)
-    {
-      // Clear any pending messages to avoid updating display with old values when we are too slow to consume all messages
+  for (;;) {
+    if (osMessageQueueGet(UiStateQHandle, &ui, NULL, osWaitForever) == osOK) {
+      // Clear any pending messages to avoid updating display with old values
+      // when we are too slow to consume all messages
 
       while (osMessageQueueGet(UiStateQHandle, &ui, NULL, 0U) == osOK) {
       }
@@ -355,23 +383,23 @@ void StartDisplayTask(void *argument)
 
 /* USER CODE BEGIN Header_Update_UART_Log */
 /**
-* @brief Function implementing the Update_UART_Log thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the Update_UART_Log thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_Update_UART_Log */
 void Update_UART_Log(void *argument)
 {
   /* USER CODE BEGIN Update_UART_Log */
-    UARTSample_t sample;
-    char buffer[128];
-    char accel_x_text[12];
-    char accel_y_text[12];
-    char accel_z_text[12];
+  UARTSample_t sample;
+  char buffer[128];
+  char accel_x_text[12];
+  char accel_y_text[12];
+  char accel_z_text[12];
   /* Infinite loop */
-  for(;;)
-  {
-    if (osMessageQueueGet(UartLogQHandle, &sample, NULL, osWaitForever) == osOK) {
+  for (;;) {
+    if (osMessageQueueGet(UartLogQHandle, &sample, NULL, osWaitForever) ==
+        osOK) {
       FormatFloat2(accel_x_text, sizeof(accel_x_text), sample.Accel_X);
       FormatFloat2(accel_y_text, sizeof(accel_y_text), sample.Accel_Y);
       FormatFloat2(accel_z_text, sizeof(accel_z_text), sample.Accel_Z);
@@ -379,8 +407,8 @@ void Update_UART_Log(void *argument)
       snprintf(buffer, sizeof(buffer),
                "Gyro: X |%-4i|, Y|%-4i|, Z|%-4i| --- |  Accel: X |%s|, Y "
                "|%s|, Z |%s| \r\n",
-               sample.Gyro_X, sample.Gyro_Y, sample.Gyro_Z,
-               accel_x_text, accel_y_text, accel_z_text);
+               sample.Gyro_X, sample.Gyro_Y, sample.Gyro_Z, accel_x_text,
+               accel_y_text, accel_z_text);
 
       HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 100);
     }
@@ -393,22 +421,23 @@ void Update_UART_Log(void *argument)
 /* USER CODE BEGIN Application */
 
 // Draws Number with 2 decimals, right aligned, and handles negative values
-// This is so we dont rely on floating point support in printf which can be large and we only need 2 decimals for the accelerometer values and also we dont need linker support for stm32
-static void FormatFloat2(char *buffer, size_t buffer_size, float value)
-{
+// This is so we dont rely on floating point support in printf which can be
+// large and we only need 2 decimals for the accelerometer values and also we
+// dont need linker support for stm32
+static void FormatFloat2(char *buffer, size_t buffer_size, float value) {
   const char *sign = (value < 0.0f) ? "-" : "";
   float abs_value = (value < 0.0f) ? -value : value;
   int32_t centi_value = (int32_t)((abs_value * 100.0f) + 0.5f);
   int32_t whole = centi_value / 100;
   int32_t decimal = centi_value % 100;
 
-  snprintf(buffer, buffer_size, "%s%ld.%02ld", sign, (long)whole, (long)decimal);
+  snprintf(buffer, buffer_size, "%s%ld.%02ld", sign, (long)whole,
+           (long)decimal);
 }
 
 static void DrawValueIfChanged(uint16_t x, uint16_t y, uint16_t width,
                                const char *value_text, char *last_text,
-                               size_t last_text_size)
-{
+                               size_t last_text_size) {
   if (strcmp(value_text, last_text) == 0) {
     return;
   }
