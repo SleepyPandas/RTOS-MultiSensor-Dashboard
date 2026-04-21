@@ -313,6 +313,8 @@ void StartDisplayTask(void *argument)
   {
     if (osMessageQueueGet(UiStateQHandle, &ui, NULL, osWaitForever) == osOK)
     {
+      // Clear any pending messages to avoid updating display with old values when we are too slow to consume all messages
+      
       while (osMessageQueueGet(UiStateQHandle, &ui, NULL, 0U) == osOK) {
       }
 
