@@ -40,6 +40,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define UI_UPDATE_PERIOD_MS 50U
+#define UART_LOG_PERIOD_MS 50U
 
 /* USER CODE END PD */
 
@@ -70,14 +72,14 @@ const osThreadAttr_t Update_Dashboard_Task_attributes = {
 osThreadId_t Update_DisplayHandle;
 const osThreadAttr_t Update_Display_attributes = {
   .name = "Update_Display",
-  .priority = (osPriority_t) osPriorityBelowNormal1,
+  .priority = (osPriority_t) osPriorityBelowNormal,
   .stack_size = 1024 * 4
 };
 /* Definitions for Update_UART_Log */
 osThreadId_t Update_UART_LogHandle;
 const osThreadAttr_t Update_UART_Log_attributes = {
   .name = "Update_UART_Log",
-  .priority = (osPriority_t) osPriorityBelowNormal,
+  .priority = (osPriority_t) osPriorityBelowNormal1,
   .stack_size = 256 * 4
 };
 /* Definitions for Blink_LED */
@@ -279,6 +281,8 @@ void StartDashboardTask(void *argument)
   IMUSample_t sample;
   UARTSample_t uart_sample;
   UIState_t ui;
+  uint32_t last_ui_update_tick = 0U;
+  uint32_t last_uart_log_tick = 0U;
 
   /* Infinite loop */
   for (;;) {
@@ -292,15 +296,24 @@ void StartDashboardTask(void *argument)
       ui.Gyro_Y = sample.Gyro_Y;
       ui.Gyro_Z = sample.Gyro_Z;
 
-      uart_sample.Accel_X = sample.Accel_X;
-      uart_sample.Accel_Y = sample.Accel_Y;
-      uart_sample.Accel_Z = sample.Accel_Z;
-      uart_sample.Gyro_X = sample.Gyro_X;
-      uart_sample.Gyro_Y = sample.Gyro_Y;
-      uart_sample.Gyro_Z = sample.Gyro_Z;
+      uint32_t now = osKernelGetTickCount();
 
-      osMessageQueuePut(UiStateQHandle, &ui, 0U, 0U);
-      osMessageQueuePut(UartLogQHandle, &uart_sample, 0U, 0U);
+      if ((now - last_ui_update_tick) >= UI_UPDATE_PERIOD_MS) {
+        osMessageQueuePut(UiStateQHandle, &ui, 0U, 0U);
+        last_ui_update_tick = now;
+      }
+
+      if ((now - last_uart_log_tick) >= UART_LOG_PERIOD_MS) {
+        uart_sample.Accel_X = sample.Accel_X;
+        uart_sample.Accel_Y = sample.Accel_Y;
+        uart_sample.Accel_Z = sample.Accel_Z;
+        uart_sample.Gyro_X = sample.Gyro_X;
+        uart_sample.Gyro_Y = sample.Gyro_Y;
+        uart_sample.Gyro_Z = sample.Gyro_Z;
+
+        osMessageQueuePut(UartLogQHandle, &uart_sample, 0U, 0U);
+        last_uart_log_tick = now;
+      }
     }
 
     osDelay(1);
@@ -421,7 +434,6 @@ void Update_UART_Log(void *argument)
 
       HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 100);
     }
-    osDelay(50);
   }
   /* USER CODE END Update_UART_Log */
 }
