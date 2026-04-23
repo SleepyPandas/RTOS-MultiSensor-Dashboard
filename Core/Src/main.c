@@ -571,6 +571,15 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
     osSemaphoreRelease(IMUDmaDoneSemHandle);
   }
 }
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART3) {
+    osSemaphoreRelease(UartTxDoneSemHandle);
+  }
+}
+
+
 /* USER CODE END 4 */
 
 /**

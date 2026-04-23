@@ -114,10 +114,10 @@ osSemaphoreId_t IMUDmaDoneSemHandle;
 const osSemaphoreAttr_t IMUDmaDoneSem_attributes = {
   .name = "IMUDmaDoneSem"
 };
-/* Definitions for UartTxDoneSemHandle */
-osSemaphoreId_t UartTxDoneSemHandleHandle;
-const osSemaphoreAttr_t UartTxDoneSemHandle_attributes = {
-  .name = "UartTxDoneSemHandle"
+/* Definitions for UartTxDoneSem */
+osSemaphoreId_t UartTxDoneSemHandle;
+const osSemaphoreAttr_t UartTxDoneSem_attributes = {
+  .name = "UartTxDoneSem"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -147,8 +147,8 @@ void MX_FREERTOS_Init(void) {
   /* creation of IMUDmaDoneSem */
   IMUDmaDoneSemHandle = osSemaphoreNew(1, 0, &IMUDmaDoneSem_attributes);
 
-  /* creation of UartTxDoneSemHandle */
-  UartTxDoneSemHandleHandle = osSemaphoreNew(1, 0, &UartTxDoneSemHandle_attributes);
+  /* creation of UartTxDoneSem */
+  UartTxDoneSemHandle = osSemaphoreNew(1, 0, &UartTxDoneSem_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */

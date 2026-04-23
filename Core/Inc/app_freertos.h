@@ -77,7 +77,7 @@ extern osMessageQueueId_t ImuSampleQHandle;
 extern osMessageQueueId_t UiStateQHandle;
 extern osMessageQueueId_t UartLogQHandle;
 extern osSemaphoreId_t IMUDmaDoneSemHandle;
-extern osSemaphoreId_t UartTxDoneSemHandleHandle;
+extern osSemaphoreId_t UartTxDoneSemHandle;
 
 /* Exported function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
