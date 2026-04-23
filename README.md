@@ -1,5 +1,7 @@
 # RTOS Multi-Sensor Dashboard
 
+![Language](https://img.shields.io/badge/Language-C-white) ![OS](https://img.shields.io/badge/OS-FreeRTOS-blue) ![Platform](https://img.shields.io/badge/Platform-STM32_ArmCortex_M33-42f5da) ![FreeRTOS](https://img.shields.io/badge/FreeRTOS-Tasks_%26_Queues-blue) ![FreeRTOS](https://img.shields.io/badge/FreeRTOS-Mutex_%26_Semaphore-orange) ![STM32](https://img.shields.io/badge/STM32-NVIC_%26_ISR-red) ![Build](https://img.shields.io/badge/Build-CMake-e81526)
+
 STM32 **FreeRTOS** demo firmware that reads an MPU6500 IMU, updates an ST7789V3 LCD,
 and streams the same sensor data over the board's USB-C virtual COM port while keeping a LED HeartBeat. 
 
