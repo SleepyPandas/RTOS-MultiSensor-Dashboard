@@ -230,15 +230,6 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  // ST7789V3_init(&st7789_config);
-
-  // InvertDisplay(&st7789_config, INVON);
-  // SetRotation(&st7789_config, Landscape);
-
-  // FillScreen(&st7789_config, BLACK);
-
-  // DrawString(&st7789_config, 1, 1, "\n AX:0 \n AY:0 \n AZ:0",  WHITE, &Font_32x32);
-  // DrawString(&st7789_config, 130, 1, "\n GX:0 \n GY:0 \n GZ:0",  WHITE, &Font_32x32);
 
   /* USER CODE END 2 */
 
