@@ -87,7 +87,7 @@ const osThreadAttr_t Update_UART_Log_attributes = {
 osThreadId_t Blink_LEDHandle;
 const osThreadAttr_t Blink_LED_attributes = {
   .name = "Blink_LED",
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityBelowNormal2,
   .stack_size = 64 * 4
 };
 /* Definitions for ScreenMutex */
