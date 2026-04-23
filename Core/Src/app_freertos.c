@@ -163,11 +163,14 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   configASSERT(ScreenMutexHandle != NULL);
+  configASSERT(IMUDmaDoneSemHandle != NULL);
   configASSERT(ImuSampleQHandle != NULL);
   configASSERT(UiStateQHandle != NULL);
+  configASSERT(UartLogQHandle != NULL);
   configASSERT(Read_IMU_TaskHandle != NULL);
   configASSERT(Update_Dashboard_TaskHandle != NULL);
   configASSERT(Update_DisplayHandle != NULL);
+  configASSERT(Update_UART_LogHandle != NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -204,15 +207,13 @@ void StartImuTask(void *argument)
 
   uint32_t next = osKernelGetTickCount();
 
-  /* Infinite loop */
   for (;;) {
-    // Start the Read one at a time they share the same DMA BUS
-
+    // Read gyro and accel sequentially because they share the I2C DMA path.
     if (MPU6500_Read_Gyro_DMA(&mpu_config, gyro_raw) == 0) {
       if (osSemaphoreAcquire(IMUDmaDoneSemHandle, 20) == osOK) {
         MPU6500_Process_Gyro_DMA(&mpu_config, gyro_raw, &gyro);
       } else {
-        // DMA did not finish in time, skip this loop
+        // Keep the task periodic if a DMA transfer does not finish in time.
         next += 10;
         osDelayUntil(next);
         continue;
@@ -246,10 +247,9 @@ void StartImuTask(void *argument)
 
     osMessageQueuePut(ImuSampleQHandle, &sample, 0U, 0U);
 
-    // On overflow RTOS tick counter has an expected warp behavior
-
-    next += 10;         // 10 ms = 100 Hz (we are using I2C limited at 100Hz so)
-    osDelayUntil(next); // fixed period
+    // osDelayUntil keeps a fixed 10 ms sample period and handles tick wrap.
+    next += 10;
+    osDelayUntil(next);
   }
   /* USER CODE END Read_IMU_Task */
 }
@@ -273,7 +273,7 @@ void StartDashboardTask(void *argument)
   for (;;) {
     if (osMessageQueueGet(ImuSampleQHandle, &sample, NULL, osWaitForever) ==
         osOK) {
-      // Process the sample and update UI state
+      // One consumer receives raw IMU samples and fans out copies to outputs.
       ui.Accel_X = sample.Accel_X;
       ui.Accel_Y = sample.Accel_Y;
       ui.Accel_Z = sample.Accel_Z;
@@ -340,9 +340,7 @@ void StartDisplayTask(void *argument)
   /* Infinite loop */
   for (;;) {
     if (osMessageQueueGet(UiStateQHandle, &ui, NULL, osWaitForever) == osOK) {
-      // Clear any pending messages to avoid updating display with old values
-      // when we are too slow to consume all messages
-
+      // Render the newest UI state if drawing falls behind the sample rate.
       while (osMessageQueueGet(UiStateQHandle, &ui, NULL, 0U) == osOK) {
       }
 
@@ -420,10 +418,7 @@ void Update_UART_Log(void *argument)
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 
-// Draws Number with 2 decimals, right aligned, and handles negative values
-// This is so we dont rely on floating point support in printf which can be
-// large and we only need 2 decimals for the accelerometer values and also we
-// dont need linker support for stm32
+// Format two decimal places without requiring printf float support.
 static void FormatFloat2(char *buffer, size_t buffer_size, float value) {
   const char *sign = (value < 0.0f) ? "-" : "";
   float abs_value = (value < 0.0f) ? -value : value;
