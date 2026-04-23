@@ -114,6 +114,11 @@ osSemaphoreId_t IMUDmaDoneSemHandle;
 const osSemaphoreAttr_t IMUDmaDoneSem_attributes = {
   .name = "IMUDmaDoneSem"
 };
+/* Definitions for UartTxDoneSemHandle */
+osSemaphoreId_t UartTxDoneSemHandleHandle;
+const osSemaphoreAttr_t UartTxDoneSemHandle_attributes = {
+  .name = "UartTxDoneSemHandle"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -141,6 +146,9 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_MUTEX */
   /* creation of IMUDmaDoneSem */
   IMUDmaDoneSemHandle = osSemaphoreNew(1, 0, &IMUDmaDoneSem_attributes);
+
+  /* creation of UartTxDoneSemHandle */
+  UartTxDoneSemHandleHandle = osSemaphoreNew(1, 0, &UartTxDoneSemHandle_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
@@ -315,8 +323,6 @@ void StartDashboardTask(void *argument)
         last_uart_log_tick = now;
       }
     }
-
-    osDelay(1);
   }
   /* USER CODE END Update_Dashboard_Task */
 }
@@ -398,7 +404,6 @@ void StartDisplayTask(void *argument)
 
       osMutexRelease(ScreenMutexHandle);
     }
-    osDelay(1);
   }
   /* USER CODE END Update_Display */
 }

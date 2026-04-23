@@ -63,6 +63,7 @@ SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef handle_GPDMA1_Channel7;
 
 UART_HandleTypeDef huart3;
+DMA_HandleTypeDef handle_GPDMA1_Channel5;
 
 /* USER CODE BEGIN PV */
 static void app_delay_ms(uint32_t milliseconds);
@@ -325,6 +326,8 @@ static void MX_GPDMA1_Init(void)
   __HAL_RCC_GPDMA1_CLK_ENABLE();
 
   /* GPDMA1 interrupt Init */
+    HAL_NVIC_SetPriority(GPDMA1_Channel5_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(GPDMA1_Channel5_IRQn);
     HAL_NVIC_SetPriority(GPDMA1_Channel6_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(GPDMA1_Channel6_IRQn);
     HAL_NVIC_SetPriority(GPDMA1_Channel7_IRQn, 5, 0);
