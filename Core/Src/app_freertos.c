@@ -26,6 +26,7 @@
 #include "fonts/fonts.h"
 #include "main.h"
 #include "mpu6500.h"
+#include "stm32h503xx.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -438,7 +439,8 @@ void Blink_LED(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+    osDelay(750);
   }
   /* USER CODE END Blink_LED */
 }
