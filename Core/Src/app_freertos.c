@@ -76,8 +76,15 @@ const osThreadAttr_t Update_Display_attributes = {
 osThreadId_t Update_UART_LogHandle;
 const osThreadAttr_t Update_UART_Log_attributes = {
   .name = "Update_UART_Log",
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityBelowNormal,
   .stack_size = 256 * 4
+};
+/* Definitions for Blink_LED */
+osThreadId_t Blink_LEDHandle;
+const osThreadAttr_t Blink_LED_attributes = {
+  .name = "Blink_LED",
+  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 64 * 4
 };
 /* Definitions for ScreenMutex */
 osMutexId_t ScreenMutexHandle;
@@ -160,6 +167,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of Update_UART_Log */
   Update_UART_LogHandle = osThreadNew(Update_UART_Log, NULL, &Update_UART_Log_attributes);
+
+  /* creation of Blink_LED */
+  Blink_LEDHandle = osThreadNew(Blink_LED, NULL, &Blink_LED_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   configASSERT(ScreenMutexHandle != NULL);
@@ -413,6 +423,24 @@ void Update_UART_Log(void *argument)
     osDelay(50);
   }
   /* USER CODE END Update_UART_Log */
+}
+
+/* USER CODE BEGIN Header_Blink_LED */
+/**
+* @brief Function implementing the Blink_LED thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Blink_LED */
+void Blink_LED(void *argument)
+{
+  /* USER CODE BEGIN Blink_LED */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Blink_LED */
 }
 
 /* Private application code --------------------------------------------------*/
