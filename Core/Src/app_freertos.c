@@ -458,10 +458,17 @@ void Blink_LED(void *argument)
 {
   /* USER CODE BEGIN Blink_LED */
   /* Infinite loop */
+
+  uint32_t next = osKernelGetTickCount();
+
   for(;;)
   {
     HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
-    osDelay(750);
+
+    next += 750;
+    osDelayUntil(next);
+  
+    
   }
   /* USER CODE END Blink_LED */
 }
