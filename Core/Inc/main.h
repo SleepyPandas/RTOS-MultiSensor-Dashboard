@@ -107,6 +107,8 @@ extern MPU6500_Config mpu_config;
 #define LCD_RES_GPIO_Port GPIOC
 #define LCD_CS_Pin GPIO_PIN_9
 #define LCD_CS_GPIO_Port GPIOC
+#define LED_BLUE_Pin GPIO_PIN_8
+#define LED_BLUE_GPIO_Port GPIOA
 #define T_SWDIO_Pin GPIO_PIN_13
 #define T_SWDIO_GPIO_Port GPIOA
 #define T_SWCLK_Pin GPIO_PIN_14
