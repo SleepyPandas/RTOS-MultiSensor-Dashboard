@@ -27,6 +27,7 @@
 #include "main.h"
 #include "mpu6500.h"
 #include "stm32h503xx.h"
+#include "stm32h5xx_hal_uart.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -437,7 +438,10 @@ void Update_UART_Log(void *argument)
                sample.Gyro_X, sample.Gyro_Y, sample.Gyro_Z, accel_x_text,
                accel_y_text, accel_z_text);
 
-      HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 100);
+
+      if (HAL_UART_Transmit_DMA(&huart3, (uint8_t *)buffer, strlen(buffer)) == HAL_OK) {
+        osSemaphoreAcquire(UartTxDoneSemHandle, 100);
+      }
     }
   }
   /* USER CODE END Update_UART_Log */
